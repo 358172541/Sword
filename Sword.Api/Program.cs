@@ -65,7 +65,7 @@ namespace Sword.Api
                             opts.AddDefaultPolicy(budr =>
                             {
                                 budr.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()
-                                    .WithExposedHeaders("X-Permission", "X-Token", "X-Validation", "X-Version");
+                                    .WithExposedHeaders("X-Entity", "X-Permission", "X-Token", "X-Validation", "X-Version");
                             });
                         });
                         svcs.AddDbContext<SwordDbContext>(budr =>
