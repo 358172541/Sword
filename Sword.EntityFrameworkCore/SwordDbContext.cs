@@ -15,7 +15,9 @@ namespace Sword.EntityFrameworkCore
     public class SwordDbContext : DbContext, ITransaction
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
-        public SwordDbContext(DbContextOptions options, IHttpContextAccessor httpContextAccessor) : base(options)
+        public SwordDbContext(
+            DbContextOptions options, 
+            IHttpContextAccessor httpContextAccessor) : base(options)
         {
             _httpContextAccessor = httpContextAccessor;
         }

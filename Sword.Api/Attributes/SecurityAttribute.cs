@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 
 namespace Sword.Api
 {
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
     public class SecurityAttribute : Attribute, IAsyncAuthorizationFilter
     {
         public string[] Identities { get; }

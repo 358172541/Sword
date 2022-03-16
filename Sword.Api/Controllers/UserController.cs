@@ -12,7 +12,6 @@ using System.Linq;
 
 namespace Sword.Api
 {
-    [AllowAnonymous]
     public class UserController : BaseController
     {
         private readonly IMapper _mapper;

@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
 namespace Sword.Core
 {
+    // [Authorize]
     public abstract class BaseController : ControllerBase
     {
         protected Guid Identity

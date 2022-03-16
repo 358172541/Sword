@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 
 namespace Sword.Api.Controllers
 {
-    [AllowAnonymous]
     public class AuthController : BaseController
     {
         private readonly ITransaction _transaction;
@@ -30,6 +29,7 @@ namespace Sword.Api.Controllers
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
+        [AllowAnonymous]
         [HttpPost, Route("api/auths/token")]
         public async Task<IActionResult> Auths_Token([FromBody] TokenRequest request)
         {
