@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Sword.Api</name>
+    </assembly>
+    <members>
+        <member name="M:Sword.Api.UserController.Auths_Token(Sword.Core.TokenRequest)">
+            <summary>
+            显示一些注释
+            </summary>
+            <param name="request">参数</param>
+            <returns></returns>
+        </member>
+        <member name="M:Sword.Api.UserController.Auths_Token_Refresh(Sword.Core.TokenRefreshRequest)">
+            <summary>
+            显示一些注释
+            </summary>
+            <param name="request">参数</param>
+            <returns></returns>
+        </member>
+        <member name="M:Sword.Api.UserController.Auths_Profile">
+            <summary>
+            显示一些注释
+            </summary>
+            <returns></returns>
+        </member>
+    </members>
+</doc>
