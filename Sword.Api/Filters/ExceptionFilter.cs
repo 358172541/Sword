@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using Sword.Api.Exceptions;
 using System.Threading.Tasks;
 
 namespace Sword.Api
@@ -11,10 +12,19 @@ namespace Sword.Api
     {
         public Task OnExceptionAsync(ExceptionContext context)
         {
+            HandleNotFoundException(context);
             HandleDbUpdateConcurrencyException(context);
             HandleTokenException(context);
             HandleValidationException(context);
             return Task.CompletedTask;
+        }
+        private static void HandleNotFoundException(ExceptionContext context)
+        {
+            if (context.Exception is NotFoundException exception)
+            {
+                context.HttpContext.Response.Headers.Add("X-Entity", "Empty");
+                context.Result = new ObjectResult(JsonConvert.SerializeObject(new string[] { exception.Message })) { StatusCode = StatusCodes.Status404NotFound };
+            }
         }
         private static void HandleDbUpdateConcurrencyException(ExceptionContext context)
         {

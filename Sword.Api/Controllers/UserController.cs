@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
+using Sword.Api.Exceptions;
 
 namespace Sword.Api
 {
@@ -57,7 +58,7 @@ namespace Sword.Api
         {
             var user = await _userRepository.FindAsync(id);
             if (user == null)
-                return NotFound();
+                throw new NotFoundException("not found.");
             var dto = _mapper.Map<UserUpdateDto>(user);
             dto.RoleIds = await _userRoleRepository.Entities.Where(x => x.UserId == user.UserId).Select(x => x.RoleId).ToListAsync();
             return Ok(dto);
@@ -68,8 +69,8 @@ namespace Sword.Api
         /// </summary>
         /// <returns></returns>
         // [Security("User.Create", "User.Update")]
-        [HttpGet, Route("api/users/before")]
-        public async Task<IActionResult> Users_Before()
+        [HttpGet, Route("api/users/lookup")]
+        public async Task<IActionResult> Users_Lookup()
         {
             var roles = _mapper.Map<List<RoleDto>>(await _roleRepository.Entities.AsNoTracking().ToListAsync());
             return Ok(new { roles });
@@ -114,7 +115,7 @@ namespace Sword.Api
             {
                 var user = await _userRepository.FindAsync(id);
                 if (user == null)
-                    return NotFound();
+                    throw new NotFoundException("not found.");
                 var single = await _userRepository.Entities.AsNoTracking().SingleOrDefaultAsync(x => x.Account == dto.Account && x.UserId != dto.Id);
                 if (single != null)
                     throw new ValidationException("user's account exists. please try another one.");
@@ -151,7 +152,7 @@ namespace Sword.Api
         {
             var user = await _userRepository.FindAsync(id);
             if (user == null)
-                return NotFound();
+                throw new NotFoundException("not found.");
             await _userRepository.DeleteAsync(user);
             await _transaction.SaveChangesAsync();
             return NoContent();

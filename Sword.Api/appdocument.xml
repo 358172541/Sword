@@ -31,7 +31,7 @@
             <param name="id"></param>
             <returns></returns>
         </member>
-        <member name="M:Sword.Api.UserController.Users_Before">
+        <member name="M:Sword.Api.UserController.Users_Lookup">
             <summary>
             Users Lookup
             </summary>
