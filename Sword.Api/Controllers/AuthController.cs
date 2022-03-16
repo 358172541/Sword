@@ -1,21 +1,35 @@
-﻿using Sword.Core;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Sword.Core;
+using Sword.Domain;
+using System;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace Sword.Api.Controllers
 {
+    [AllowAnonymous]
     public class AuthController : BaseController
     {
-        public AuthController()
-        {
+        private readonly ITransaction _transaction;
+        private readonly IUserRepository _userRepository;
 
+        public AuthController(
+            ITransaction transaction,
+            IUserRepository userRepository)
+        {
+            _transaction = transaction;
+            _userRepository = userRepository;
         }
 
-        /*
         /// <summary>
         /// √
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        [AllowAnonymous]
         [HttpPost, Route("api/auths/token")]
         public async Task<IActionResult> Auths_Token([FromBody] TokenRequest request)
         {
@@ -34,8 +48,8 @@ namespace Sword.Api.Controllers
                 var tokenRefreshExpireTime = notBefore.AddSeconds(60 * 30); // yes and also update tokenRefreshExpireTime
                 var token = new JwtSecurityTokenHandler().WriteToken(
                     new JwtSecurityToken(
-                        Mentoz.Issuer,
-                        Mentoz.Audience,
+                        Program.Issuer,
+                        Program.Audience,
                         new Claim[]
                         {
                             new Claim(JwtRegisteredClaimNames.Sub, user.UserId.ToString())
@@ -43,7 +57,7 @@ namespace Sword.Api.Controllers
                         notBefore,
                         tokenExpireTime,
                         new SigningCredentials(new SymmetricSecurityKey(
-                            Convert.FromBase64String(Mentoz.Secret)),
+                            Convert.FromBase64String(Program.Secret)),
                             SecurityAlgorithms.HmacSha256)
                     ));
                 user.Token = token;
@@ -61,8 +75,8 @@ namespace Sword.Api.Controllers
                     var tokenRefreshExpireTime = user.TokenRefreshExpireTime; // yes but not update tokenRefreshExpireTime
                     var token = new JwtSecurityTokenHandler().WriteToken(
                         new JwtSecurityToken(
-                            Mentoz.Issuer,
-                            Mentoz.Audience,
+                            Program.Issuer,
+                            Program.Audience,
                             new Claim[]
                             {
                                 new Claim(JwtRegisteredClaimNames.Sub, user.UserId.ToString())
@@ -70,7 +84,7 @@ namespace Sword.Api.Controllers
                             notBefore,
                             tokenExpireTime,
                             new SigningCredentials(new SymmetricSecurityKey(
-                                Convert.FromBase64String(Mentoz.Secret)),
+                                Convert.FromBase64String(Program.Secret)),
                                 SecurityAlgorithms.HmacSha256)
                         ));
                     user.Token = token;
@@ -106,10 +120,10 @@ namespace Sword.Api.Controllers
                     request.Token,
                     new TokenValidationParameters
                     {
-                        IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(Mentoz.Secret)),
+                        IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(Program.Secret)),
                         RequireExpirationTime = true,
-                        ValidAudience = Mentoz.Audience,
-                        ValidIssuer = Mentoz.Issuer,
+                        ValidAudience = Program.Audience,
+                        ValidIssuer = Program.Issuer,
                         ValidateAudience = true,
                         ValidateIssuer = true,
                         ValidateIssuerSigningKey = true,
@@ -147,8 +161,8 @@ namespace Sword.Api.Controllers
                     var tokenRefreshExpireTime = user.TokenRefreshExpireTime; // yes but not update tokenRefreshExpireTime
                     var token = new JwtSecurityTokenHandler().WriteToken(
                         new JwtSecurityToken(
-                            Mentoz.Issuer,
-                            Mentoz.Audience,
+                            Program.Issuer,
+                            Program.Audience,
                             new Claim[]
                             {
                                 new Claim(JwtRegisteredClaimNames.Sub, user.UserId.ToString())
@@ -156,7 +170,7 @@ namespace Sword.Api.Controllers
                             notBefore,
                             tokenExpireTime,
                             new SigningCredentials(new SymmetricSecurityKey(
-                                Convert.FromBase64String(Mentoz.Secret)),
+                                Convert.FromBase64String(Program.Secret)),
                                 SecurityAlgorithms.HmacSha256)
                         ));
                     user.Token = token;
@@ -175,39 +189,30 @@ namespace Sword.Api.Controllers
             });
         }
 
-        /// <summary>
-        /// √
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet, Route("api/auths/profile")]
-        public async Task<IActionResult> Auths_Profile()
-        {
-            var user = await _userRepository.FindAsync(Identity);
-            return Ok(user);
-        }
+        //[HttpGet, Route("api/auths/profile")]
+        //public async Task<IActionResult> Auths_Profile()
+        //{
+        //    var user = await _userRepository.FindAsync(Identity);
+        //    return Ok(user);
+        //}
 
-        /// <summary>
-        /// √
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet, Route("api/auths/resource")]
-        public async Task<IActionResult> Auths_Resource()
-        {
-            var user = await _userRepository.FindAsync(Identity);
-            if (user.Type == UserType.MANAGER)
-            {
-                var rescs = await _rescRepository.Entities.AsNoTracking().ToListAsync();
-                return Ok(_mapper.Map<List<RescModel>>(rescs));
-            }
-            else
-            {
-                var roleIds = await _userRoleRepository.Entities.AsNoTracking().Where(x => x.UserId == Identity).Select(x => x.RoleId).ToListAsync();
-                var rescIds = await _roleRescRepository.Entities.AsNoTracking().Where(x => roleIds.Contains(x.RoleId)).Select(x => x.RescId).ToListAsync();
-                var rescs = await _rescRepository.Entities.AsNoTracking().Where(x => rescIds.Contains(x.RescId)).ToListAsync();
-                return Ok(_mapper.Map<List<RescModel>>(rescs));
-            }
-        }
-        */
+        //[HttpGet, Route("api/auths/resource")]
+        //public async Task<IActionResult> Auths_Resource()
+        //{
+        //    var user = await _userRepository.FindAsync(Identity);
+        //    if (user.Type == UserType.MANAGER)
+        //    {
+        //        var rescs = await _rescRepository.Entities.AsNoTracking().ToListAsync();
+        //        return Ok(_mapper.Map<List<RescModel>>(rescs));
+        //    }
+        //    else
+        //    {
+        //        var roleIds = await _userRoleRepository.Entities.AsNoTracking().Where(x => x.UserId == Identity).Select(x => x.RoleId).ToListAsync();
+        //        var rescIds = await _roleRescRepository.Entities.AsNoTracking().Where(x => roleIds.Contains(x.RoleId)).Select(x => x.RescId).ToListAsync();
+        //        var rescs = await _rescRepository.Entities.AsNoTracking().Where(x => rescIds.Contains(x.RescId)).ToListAsync();
+        //        return Ok(_mapper.Map<List<RescModel>>(rescs));
+        //    }
+        //}
 
         #region Token        
         //private dynamic TokenGenerate(string subject)

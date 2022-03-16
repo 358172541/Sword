@@ -1,7 +1,7 @@
-﻿using Sword.Core;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Sword.Core;
 using System;
 using System.Linq;
 using System.Reflection;

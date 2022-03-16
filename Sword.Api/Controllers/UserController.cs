@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
-using Sword.Application.Dtos;
-using Sword.Core;
-using Sword.Domain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Sword.Application.Dtos;
+using Sword.Core;
+using Sword.Domain;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -36,7 +36,7 @@ namespace Sword.Api
         }
 
         /// <summary>
-        /// √
+        /// Users Search
         /// </summary>
         /// <returns></returns>
         // [Security("User")]
@@ -48,7 +48,7 @@ namespace Sword.Api
         }
 
         /// <summary>
-        /// √
+        /// Users Single
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -65,7 +65,7 @@ namespace Sword.Api
         }
 
         /// <summary>
-        /// √
+        /// Users Lookup
         /// </summary>
         /// <returns></returns>
         // [Security("User.Create", "User.Update")]
@@ -77,7 +77,7 @@ namespace Sword.Api
         }
 
         /// <summary>
-        /// √
+        /// Users Create
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
@@ -102,7 +102,7 @@ namespace Sword.Api
         }
 
         /// <summary>
-        /// √
+        /// Users Update
         /// </summary>
         /// <param name="id"></param>
         /// <param name="dto"></param>
