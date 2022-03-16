@@ -1,11 +1,12 @@
 ﻿using Autofac;
-using Sword.Domain;
-using Sword.Domain.Enums;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
+using Sword.Domain;
+using Sword.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -22,21 +23,19 @@ namespace Sword.Api
         {
             Identities = identities;
         }
-        public Task OnAuthorizationAsync(AuthorizationFilterContext context)
+        public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
         {
-            //var currentUser = await CurrentUser(context);
-            //if (currentUser == null) PermissionDenied(context);
-            //if (currentUser.Type == UserType.MANAGER == false)
-            //{
-            //    var currentUserRoleIds = await CurrentUserRoleIds(context, currentUser.UserId);
-            //    var currentUserRescIds = await CurrentUserRescIds(context, currentUserRoleIds);
-            //    var convertAttrRescIds = await ConvertAttrRescIds(context);
-            //    if (currentUserRescIds.Intersect(convertAttrRescIds).Any() == false) PermissionDenied(context);
-            //}
-            return Task.CompletedTask;
+            var currentUser = await CurrentUser(context);
+            if (currentUser == null) PermissionDenied(context);
+            if (currentUser.Type == UserType.MANAGER == false)
+            {
+                var currentUserRoleIds = await CurrentUserRoleIds(context, currentUser.UserId);
+                var currentUserRescIds = await CurrentUserRescIds(context, currentUserRoleIds);
+                var convertAttrRescIds = await ConvertAttrRescIds(context);
+                if (currentUserRescIds.Intersect(convertAttrRescIds).Any() == false) PermissionDenied(context);
+            }
         }
-        /*
-        private async Task<User> CurrentUser(AuthorizationFilterContext context)
+        private static async Task<User> CurrentUser(AuthorizationFilterContext context)
         {
             var identity = context.HttpContext.User.Identity as ClaimsIdentity;
             var subject = identity.FindFirst(x => x.Type == JwtRegisteredClaimNames.Sub);
@@ -45,7 +44,7 @@ namespace Sword.Api
             var repository = serviceProvider.GetRequiredService<IUserRepository>();
             return await repository.FindAsync(currentUserId);
         }
-        private async Task<List<Guid>> CurrentUserRoleIds(AuthorizationFilterContext context, Guid currentUserId)
+        private static async Task<List<Guid>> CurrentUserRoleIds(AuthorizationFilterContext context, Guid currentUserId)
         {
             var serviceProvider = context.HttpContext.RequestServices;
             var repository = serviceProvider.GetRequiredService<IUserRoleRepository>();
@@ -54,7 +53,7 @@ namespace Sword.Api
                 .Select(x => x.RoleId)
                 .ToListAsync();
         }
-        private async Task<List<Guid>> CurrentUserRescIds(AuthorizationFilterContext context, List<Guid> currentUserRoleIds)
+        private static async Task<List<Guid>> CurrentUserRescIds(AuthorizationFilterContext context, List<Guid> currentUserRoleIds)
         {
             var serviceProvider = context.HttpContext.RequestServices;
             var repository = serviceProvider.GetRequiredService<IRoleRescRepository>();
@@ -72,11 +71,10 @@ namespace Sword.Api
                 .Select(x => x.RescId)
                 .ToListAsync();
         }
-        private void PermissionDenied(AuthorizationFilterContext context)
+        private static void PermissionDenied(AuthorizationFilterContext context)
         {
             context.HttpContext.Response.Headers.Add("X-Permission", "Denied");
             context.Result = new ObjectResult(JsonConvert.SerializeObject(new string[] { "Permission denied." })) { StatusCode = StatusCodes.Status403Forbidden };
         }
-        */
     }
 }

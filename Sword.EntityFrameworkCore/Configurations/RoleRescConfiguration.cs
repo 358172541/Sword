@@ -1,12 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Sword.Domain;
 
 namespace Sword.EntityFrameworkCore.Configurations
 {
-    internal class RoleRescConfiguration
+    public class RoleRescConfiguration : IEntityTypeConfiguration<RoleResc>
     {
+        public void Configure(EntityTypeBuilder<RoleResc> builder)
+        {
+            builder.HasKey(x => new { x.RoleId, x.RescId });
+        }
     }
 }

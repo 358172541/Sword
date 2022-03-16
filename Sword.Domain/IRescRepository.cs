@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Sword.Core;
 
 namespace Sword.Domain
 {
-    internal interface IRescRepository
-    {
-    }
+    public interface IRescRepository : IRepository<Resc> { }
 }

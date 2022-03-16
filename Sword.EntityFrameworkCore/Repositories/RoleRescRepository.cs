@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Sword.Core;
+using Sword.Domain;
 
 namespace Sword.EntityFrameworkCore.Repositories
 {
-    internal class RoleRescRepository
+    public class RoleRescRepository : SwordRepository<RoleResc>, IRoleRescRepository
     {
+        public RoleRescRepository(ITransaction transaction) : base(transaction) { }
     }
 }

@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Sword.Domain
 {
-    internal class RoleResc
+    public class RoleResc
     {
+        public Guid RoleId { get; set; }
+        public Guid RescId { get; set; }
     }
 }
