@@ -5,7 +5,7 @@ using System.Security.Claims;
 
 namespace Sword.Core
 {
-    public class BaseController : ControllerBase
+    public abstract class BaseController : ControllerBase
     {
         protected Guid Identity
         {

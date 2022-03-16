@@ -10,6 +10,26 @@ namespace Sword.EntityFrameworkCore.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "Role",
+                columns: table => new
+                {
+                    RoleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Display = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Available = table.Column<bool>(type: "bit", nullable: false),
+                    CreateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Creator = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UpdateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Updator = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    DeleteTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Deletor = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Version = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Role", x => x.RoleId);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "User",
                 columns: table => new
                 {
@@ -35,10 +55,28 @@ namespace Sword.EntityFrameworkCore.Migrations
                     table.PrimaryKey("PK_User", x => x.UserId);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "UserRole",
+                columns: table => new
+                {
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    RoleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserRole", x => new { x.UserId, x.RoleId });
+                });
+
             migrationBuilder.InsertData(
                 table: "User",
                 columns: new[] { "UserId", "Account", "Available", "CreateTime", "Creator", "DeleteTime", "Deletor", "Display", "Password", "Token", "TokenExpireTime", "TokenRefreshExpireTime", "Type", "UpdateTime", "Updator" },
                 values: new object[] { new Guid("11111111-1111-1111-1111-111111111111"), "tester", true, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new Guid("00000000-0000-0000-0000-000000000000"), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new Guid("00000000-0000-0000-0000-000000000000"), "tester", "tester", null, null, null, 0, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new Guid("00000000-0000-0000-0000-000000000000") });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Role_Display",
+                table: "Role",
+                column: "Display",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_User_Account",
@@ -50,7 +88,13 @@ namespace Sword.EntityFrameworkCore.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "Role");
+
+            migrationBuilder.DropTable(
                 name: "User");
+
+            migrationBuilder.DropTable(
+                name: "UserRole");
         }
     }
 }

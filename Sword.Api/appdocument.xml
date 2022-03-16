@@ -4,24 +4,45 @@
         <name>Sword.Api</name>
     </assembly>
     <members>
-        <member name="M:Sword.Api.UserController.Auths_Token(Sword.Core.TokenRequest)">
+        <member name="M:Sword.Api.UserController.Users_Search">
             <summary>
-            显示一些注释
+            √
             </summary>
-            <param name="request">参数</param>
             <returns></returns>
         </member>
-        <member name="M:Sword.Api.UserController.Auths_Token_Refresh(Sword.Core.TokenRefreshRequest)">
+        <member name="M:Sword.Api.UserController.Users_Single(System.Guid)">
             <summary>
-            显示一些注释
+            √
             </summary>
-            <param name="request">参数</param>
+            <param name="id"></param>
             <returns></returns>
         </member>
-        <member name="M:Sword.Api.UserController.Auths_Profile">
+        <member name="M:Sword.Api.UserController.Users_Before">
             <summary>
-            显示一些注释
+            √
             </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Sword.Api.UserController.Users_Create(Sword.Application.Dtos.UserCreateDto)">
+            <summary>
+            √
+            </summary>
+            <param name="dto"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Sword.Api.UserController.Users_Update(System.Guid,Sword.Application.Dtos.UserUpdateDto)">
+            <summary>
+            √
+            </summary>
+            <param name="id"></param>
+            <param name="dto"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Sword.Api.UserController.Users_Delete(System.Guid)">
+            <summary>
+            Users Delete
+            </summary>
+            <param name="id"></param>
             <returns></returns>
         </member>
     </members>

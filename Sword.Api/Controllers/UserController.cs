@@ -5,34 +5,41 @@ using Sword.Domain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace Sword.Api
 {
-    [Authorize]
+    [AllowAnonymous]
     public class UserController : BaseController
     {
-
         private readonly IMapper _mapper;
         private readonly ITransaction _transaction;
+        private readonly IRoleRepository _roleRepository;
         private readonly IUserRepository _userRepository;
+        private readonly IUserRoleRepository _userRoleRepository;
 
         public UserController(
             IMapper mapper,
             ITransaction transaction,
-            IUserRepository userRepository)
+            IRoleRepository roleRepository,
+            IUserRepository userRepository,
+            IUserRoleRepository userRoleRepository)
         {
             _mapper = mapper;
             _transaction = transaction;
+            _roleRepository = roleRepository;
             _userRepository = userRepository;
+            _userRoleRepository = userRoleRepository;
         }
 
-        [AllowAnonymous]
+        /// <summary>
+        /// √
+        /// </summary>
+        /// <returns></returns>
+        // [Security("User")]
         [HttpGet, Route("api/users")]
         public async Task<IActionResult> Users_Search()
         {
@@ -41,235 +48,114 @@ namespace Sword.Api
         }
 
         /// <summary>
-        /// 显示一些注释
+        /// √
         /// </summary>
-        /// <param name="request">参数</param>
+        /// <param name="id"></param>
         /// <returns></returns>
-        [AllowAnonymous]
-        [HttpPost, Route("api/auths/token")]
-        public async Task<IActionResult> Auths_Token([FromBody] TokenRequest request)
+        // [Security("User")]
+        [HttpGet, Route("api/users/{id}", Name = "users:single")]
+        public async Task<IActionResult> Users_Single(Guid id)
         {
-            var user = await _userRepository.Entities.SingleOrDefaultAsync(x => x.Account == request.Account && x.Password == request.Password);
-
+            var user = await _userRepository.FindAsync(id);
             if (user == null)
                 return NotFound();
-
-            if (user.Token == null ||
-                user.TokenExpireTime == null ||
-                user.TokenRefreshExpireTime == null ||
-                user.TokenRefreshExpireTime <= DateTime.Now)
-            {
-                var notBefore = Convert.ToDateTime(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")); // truncate to whole seconds
-                var tokenExpireTime = notBefore.AddSeconds(60 * 5);
-                var tokenRefreshExpireTime = notBefore.AddSeconds(60 * 30); // yes and also update tokenRefreshExpireTime
-                var token = new JwtSecurityTokenHandler().WriteToken(
-                    new JwtSecurityToken(
-                        Program.Issuer,
-                        Program.Audience,
-                        new Claim[]
-                        {
-                            new Claim(JwtRegisteredClaimNames.Sub, user.UserId.ToString())
-                        },
-                        notBefore,
-                        tokenExpireTime,
-                        new SigningCredentials(new SymmetricSecurityKey(
-                            Convert.FromBase64String(Program.Secret)),
-                            SecurityAlgorithms.HmacSha256)
-                    ));
-                user.Token = token;
-                user.TokenExpireTime = tokenExpireTime;
-                user.TokenRefreshExpireTime = tokenRefreshExpireTime;
-                await _userRepository.UpdateAsync(user);
-                await _transaction.SaveChangesAsync();
-            }
-            else
-            {
-                if (user.TokenExpireTime <= DateTime.Now)
-                {
-                    var notBefore = Convert.ToDateTime(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")); // truncate to whole seconds
-                    var tokenExpireTime = notBefore.AddSeconds(60 * 5);
-                    var tokenRefreshExpireTime = user.TokenRefreshExpireTime; // yes but not update tokenRefreshExpireTime
-                    var token = new JwtSecurityTokenHandler().WriteToken(
-                        new JwtSecurityToken(
-                            Program.Issuer,
-                            Program.Audience,
-                            new Claim[]
-                            {
-                                new Claim(JwtRegisteredClaimNames.Sub, user.UserId.ToString())
-                            },
-                            notBefore,
-                            tokenExpireTime,
-                            new SigningCredentials(new SymmetricSecurityKey(
-                                Convert.FromBase64String(Program.Secret)),
-                                SecurityAlgorithms.HmacSha256)
-                        ));
-                    user.Token = token;
-                    user.TokenExpireTime = tokenExpireTime;
-                    user.TokenRefreshExpireTime = tokenRefreshExpireTime;
-                    await _userRepository.UpdateAsync(user);
-                    await _transaction.SaveChangesAsync();
-                }
-            }
-
-            return Ok(new TokenResponse
-            {
-                Token = user.Token,
-                TokenExpireTime = (DateTime)user.TokenExpireTime,
-                TokenRefreshExpireTime = (DateTime)user.TokenRefreshExpireTime
-            });
+            var dto = _mapper.Map<UserUpdateDto>(user);
+            dto.RoleIds = await _userRoleRepository.Entities.Where(x => x.UserId == user.UserId).Select(x => x.RoleId).ToListAsync();
+            return Ok(dto);
         }
 
         /// <summary>
-        /// 显示一些注释
+        /// √
         /// </summary>
-        /// <param name="request">参数</param>
         /// <returns></returns>
-        [AllowAnonymous]
-        [HttpPut, Route("api/auths/token/refresh")]
-        public async Task<IActionResult> Auths_Token_Refresh([FromBody] TokenRefreshRequest request)
+        // [Security("User.Create", "User.Update")]
+        [HttpGet, Route("api/users/before")]
+        public async Task<IActionResult> Users_Before()
         {
-            var claimsPrincipal = default(ClaimsPrincipal);
+            var roles = _mapper.Map<List<RoleDto>>(await _roleRepository.Entities.AsNoTracking().ToListAsync());
+            return Ok(new { roles });
+        }
 
-            try
-            {
-                claimsPrincipal = new JwtSecurityTokenHandler().ValidateToken(
-                    request.Token,
-                    new TokenValidationParameters
+        /// <summary>
+        /// √
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        // [Security("User.Create")]
+        [HttpPost, Route("api/users")]
+        public async Task<IActionResult> Users_Create([FromBody] UserCreateDto dto)
+        {
+            var single = await _userRepository.Entities.AsNoTracking().SingleOrDefaultAsync(x => x.Account == dto.Account);
+            if (single != null)
+                throw new ValidationException("user's account exists. please try another one.");
+            var user = _mapper.Map<User>(dto);
+            await _userRepository.InsertAsync(user);
+            if (dto.RoleIds.Count > 0)
+                await _userRoleRepository.InsertAsync(
+                    dto.RoleIds.Select(x => new UserRole
                     {
-                        IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(Program.Secret)),
-                        RequireExpirationTime = true,
-                        ValidAudience = Program.Audience,
-                        ValidIssuer = Program.Issuer,
-                        ValidateAudience = true,
-                        ValidateIssuer = true,
-                        ValidateIssuerSigningKey = true,
-                        ValidateLifetime = false
-                    },
-                    out var token);
-            }
-            catch (Exception)
-            {
-                // return BadRequest(); // ???
-                throw new TokenException("token invalid.");
-            }
-
-            var claimsIdentity = claimsPrincipal.Identity as ClaimsIdentity;
-
-            var claim = claimsIdentity.FindFirst(x => x.Type == JwtRegisteredClaimNames.Sub);
-
-            _ = Guid.TryParse(claim?.Value, out var userId);
-
-            var user = await _userRepository.FindAsync(userId);
-
-            if (user.Token != request.Token ||
-                user.TokenExpireTime.Value != request.TokenExpireTime ||
-                user.TokenRefreshExpireTime.Value != request.TokenRefreshExpireTime ||
-                user.TokenRefreshExpireTime <= DateTime.Now)
-            {
-                throw new TokenException("token invalid.");
-            }
-            else
-            {
-                if (user.TokenExpireTime <= DateTime.Now)
-                {
-                    var notBefore = Convert.ToDateTime(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")); // truncate to whole seconds
-                    var tokenExpireTime = notBefore.AddSeconds(60);
-                    var tokenRefreshExpireTime = user.TokenRefreshExpireTime; // yes but not update tokenRefreshExpireTime
-                    var token = new JwtSecurityTokenHandler().WriteToken(
-                        new JwtSecurityToken(
-                            Program.Issuer,
-                            Program.Audience,
-                            new Claim[]
-                            {
-                                new Claim(JwtRegisteredClaimNames.Sub, user.UserId.ToString())
-                            },
-                            notBefore,
-                            tokenExpireTime,
-                            new SigningCredentials(new SymmetricSecurityKey(
-                                Convert.FromBase64String(Program.Secret)),
-                                SecurityAlgorithms.HmacSha256)
-                        ));
-                    user.Token = token;
-                    user.TokenExpireTime = tokenExpireTime;
-                    user.TokenRefreshExpireTime = tokenRefreshExpireTime;
-                    await _userRepository.UpdateAsync(user);
-                    await _transaction.SaveChangesAsync();
-                }
-            }
-
-            return Ok(new TokenResponse
-            {
-                Token = user.Token,
-                TokenExpireTime = (DateTime)user.TokenExpireTime,
-                TokenRefreshExpireTime = (DateTime)user.TokenRefreshExpireTime
-            });
+                        RoleId = x,
+                        UserId = user.UserId
+                    }).ToList());
+            await _transaction.SaveChangesAsync();
+            return CreatedAtRoute("users:single", new { id = user.UserId }, "");
         }
 
         /// <summary>
-        /// 显示一些注释
+        /// √
         /// </summary>
+        /// <param name="id"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpGet, Route("api/auths/profile")]
-        public async Task<IActionResult> Auths_Profile()
+        // [Security("User.Update")]
+        [HttpPut, Route("api/users/{id}")]
+        public async Task<IActionResult> Users_Update(Guid id, [FromBody] UserUpdateDto dto)
         {
-            var user = await _userRepository.FindAsync(Identity);
-            return Ok(user);
+            if (dto.Id == id)
+            {
+                var user = await _userRepository.FindAsync(id);
+                if (user == null)
+                    return NotFound();
+                var single = await _userRepository.Entities.AsNoTracking().SingleOrDefaultAsync(x => x.Account == dto.Account && x.UserId != dto.Id);
+                if (single != null)
+                    throw new ValidationException("user's account exists. please try another one.");
+                if (dto.Version != user.Version.ToHexString())
+                    throw new DbUpdateConcurrencyException("data changed.");
+                await _userRepository.UpdateAsync(_mapper.Map(dto, user));
+                var userRoles = dto.RoleIds.Select(x => new UserRole
+                {
+                    RoleId = x,
+                    UserId = user.UserId
+                }).ToList();
+                var userRoles2 = await _userRoleRepository.Entities.Where(x => x.UserId == user.UserId).ToListAsync();
+                var insertUserRoles = userRoles.Except(userRoles2).ToList();
+                if (insertUserRoles.Count > 0)
+                    await _userRoleRepository.InsertAsync(insertUserRoles);
+                var deleteUserRoles = userRoles2.Except(userRoles).ToList();
+                if (deleteUserRoles.Count > 0)
+                    await _userRoleRepository.DeleteAsync(deleteUserRoles);
+                await _transaction.SaveChangesAsync();
+                return NoContent();
+            }
+            return BadRequest();
         }
 
-        #region Token        
-        //private dynamic TokenGenerate(string subject)
-        //{
-        //    var notBefore = DateTime.Now;
-        //    var accessTokenExpireTime = notBefore.AddSeconds(3600);
-        //    var accessToken = new JwtSecurityTokenHandler().WriteToken(
-        //        new JwtSecurityToken(
-        //            Sword.Issuer,
-        //            Sword.Audience,
-        //            new Claim[]
-        //            {
-        //                new Claim(JwtRegisteredClaimNames.Sub, subject)
-        //            },
-        //            notBefore,
-        //            accessTokenExpireTime,
-        //            new SigningCredentials(new SymmetricSecurityKey(
-        //                Convert.FromBase64String(Sword.Secret)),
-        //                SecurityAlgorithms.HmacSha256)
-        //        )
-        //    );
-        //    var refreshTokenExpireTime = notBefore.AddSeconds(3600 * 24);
-        //    var bytes = new byte[32];
-        //    using (var generator = RandomNumberGenerator.Create()) generator.GetBytes(bytes);
-        //    var refreshToken = Convert.ToBase64String(bytes);
-        //    return new
-        //    {
-        //        AccessToken = accessToken,
-        //        AccessTokenExpireTime = accessTokenExpireTime,
-        //        RefreshToken = refreshToken,
-        //        RefreshTokenExpireTime = refreshTokenExpireTime
-        //    };
-        //}
-        //private ClaimsPrincipal TokenValidate(string accessToken)
-        //{
-        //    try
-        //    {
-        //        var validationParameters = new TokenValidationParameters
-        //        {
-        //            IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(Sword.Secret)),
-        //            RequireExpirationTime = true,
-        //            ValidAudience = Sword.Audience,
-        //            ValidIssuer = Sword.Issuer,
-        //            ValidateAudience = true,
-        //            ValidateIssuer = true,
-        //            ValidateIssuerSigningKey = true,
-        //            ValidateLifetime = false
-        //        };
-        //        return new JwtSecurityTokenHandler().ValidateToken(accessToken, validationParameters, out var validatedToken);
-        //    }
-        //    catch (Exception)
-        //    {
-        //        throw new TokenException("access_token invalid."); // exception filter will handle it
-        //    }
-        //}
-        #endregion
+        /// <summary>
+        /// Users Delete
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        // [Security("User.Delete")]
+        [AllowAnonymous]
+        [HttpDelete, Route("api/users/{id}")]
+        public async Task<IActionResult> Users_Delete(Guid id)
+        {
+            var user = await _userRepository.FindAsync(id);
+            if (user == null)
+                return NotFound();
+            await _userRepository.DeleteAsync(user);
+            await _transaction.SaveChangesAsync();
+            return NoContent();
+        }
     }
 }

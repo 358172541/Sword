@@ -31,6 +31,14 @@ namespace Sword.Application
 
         public SwordProfile()
         {
+            CreateMap<Role, RoleDto>()
+                .ForMember(
+                    dest => dest.Id,
+                    opts => opts.MapFrom(src => src.RoleId))
+                .ForMember(
+                    dest => dest.AvailableDisplay,
+                    opts => opts.MapFrom(src => AVAILABLE[src.Available]));
+
             CreateMap<User, UserDto>()
                 .ForMember(
                     dest => dest.Id,
