@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Sword.Api.Exceptions
+namespace Api.Exceptions
 {
     public class NotFoundException : Exception
     {

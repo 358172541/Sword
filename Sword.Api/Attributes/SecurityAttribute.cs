@@ -1,12 +1,12 @@
 ﻿using Autofac;
+using Domain;
+using Domain.Enums;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
-using Sword.Domain;
-using Sword.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -14,7 +14,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
-namespace Sword.Api
+namespace Api
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
     public class SecurityAttribute : Attribute, IAsyncAuthorizationFilter

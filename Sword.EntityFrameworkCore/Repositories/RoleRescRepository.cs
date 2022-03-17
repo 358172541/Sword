@@ -1,9 +1,9 @@
-﻿using Sword.Core;
-using Sword.Domain;
+﻿using Core;
+using Domain;
 
-namespace Sword.EntityFrameworkCore.Repositories
+namespace EntityFrameworkCore.Repositories
 {
-    public class RoleRescRepository : SwordRepository<RoleResc>, IRoleRescRepository
+    public class RoleRescRepository : BaseRepository<RoleResc>, IRoleRescRepository
     {
         public RoleRescRepository(ITransaction transaction) : base(transaction) { }
     }

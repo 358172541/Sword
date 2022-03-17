@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Sword.Api
+namespace Api.Exceptions
 {
     public class TokenException : Exception
     {

@@ -1,7 +1,7 @@
-﻿using Sword.Core;
+﻿using Core;
 using System;
 
-namespace Sword.Domain
+namespace Domain
 {
     public class Role : BaseEntity
     {

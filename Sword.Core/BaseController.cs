@@ -4,7 +4,7 @@ using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
-namespace Sword.Core
+namespace Core
 {
     // [Authorize]
     public abstract class BaseController : ControllerBase

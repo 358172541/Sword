@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Core;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Sword.Core;
 using System;
 using System.Linq;
 using System.Reflection;
@@ -10,12 +10,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.IdentityModel.Tokens.Jwt;
 
-namespace Sword.EntityFrameworkCore
+namespace EntityFrameworkCore
 {
-    public class SwordDbContext : DbContext, ITransaction
+    public class AppDbContext : DbContext, ITransaction
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
-        public SwordDbContext(
+        public AppDbContext(
             DbContextOptions options, 
             IHttpContextAccessor httpContextAccessor) : base(options)
         {

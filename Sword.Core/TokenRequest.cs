@@ -1,4 +1,4 @@
-﻿namespace Sword.Core
+﻿namespace Core
 {
     public class TokenRequest
     {

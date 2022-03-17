@@ -1,14 +1,14 @@
 ﻿using AutoMapper;
-using Sword.Application.Dtos;
-using Sword.Core;
-using Sword.Domain;
-using Sword.Domain.Enums;
+using Application.Dtos;
+using Core;
+using Domain;
+using Domain.Enums;
 using System;
 using System.Collections.Generic;
 
-namespace Sword.Application
+namespace Application
 {
-    public class SwordProfile : Profile
+    public class MapperProfile : Profile
     {
         public static readonly Dictionary<bool, string> AVAILABLE =
             new Dictionary<bool, string>
@@ -29,7 +29,7 @@ namespace Sword.Application
                 { UserType.MEMBER, "MEMBER" }
             };
 
-        public SwordProfile()
+        public MapperProfile()
         {
             CreateMap<Role, RoleDto>()
                 .ForMember(

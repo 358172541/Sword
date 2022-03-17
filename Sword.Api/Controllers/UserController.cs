@@ -1,17 +1,17 @@
-﻿using AutoMapper;
+﻿using Api.Exceptions;
+using Application.Dtos;
+using AutoMapper;
+using Core;
+using Domain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Sword.Application.Dtos;
-using Sword.Core;
-using Sword.Domain;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
-using Sword.Api.Exceptions;
 
-namespace Sword.Api
+namespace Api
 {
     public class UserController : BaseController
     {
@@ -60,7 +60,7 @@ namespace Sword.Api
             if (user == null)
                 throw new NotFoundException("not found.");
             var dto = _mapper.Map<UserUpdateDto>(user);
-            dto.RoleIds = await _userRoleRepository.Entities.Where(x => x.UserId == user.UserId).Select(x => x.RoleId).ToListAsync();
+            dto.RoleIds = await _userRoleRepository.GetRoleIds(user.UserId);
             return Ok(dto);
         }
 

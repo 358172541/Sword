@@ -1,10 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Domain;
+using Domain.Enums;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Sword.Domain;
-using Sword.Domain.Enums;
 using System;
 
-namespace Sword.EntityFrameworkCore.Configurations
+namespace EntityFrameworkCore.Configurations
 {
     public class RescConfiguration : IEntityTypeConfiguration<Resc>
     {

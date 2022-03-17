@@ -1,12 +1,12 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Api.Exceptions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-using Sword.Api.Exceptions;
 using System.Threading.Tasks;
 
-namespace Sword.Api
+namespace Api.Filters
 {
     public class ExceptionFilter : IAsyncExceptionFilter
     {

@@ -1,4 +1,4 @@
-﻿namespace Sword.Domain.Enums
+﻿namespace Domain.Enums
 {
     public enum RescType { MENU, CTRL }
 }

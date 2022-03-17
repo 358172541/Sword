@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Domain;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Sword.Domain;
 
-namespace Sword.EntityFrameworkCore.Configurations
+namespace EntityFrameworkCore.Configurations
 {
     public class RoleRescConfiguration : IEntityTypeConfiguration<RoleResc>
     {

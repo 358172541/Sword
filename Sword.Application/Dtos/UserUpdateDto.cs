@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Sword.Application.Dtos
+namespace Application.Dtos
 {
     public class UserUpdateDto
     {

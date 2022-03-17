@@ -1,8 +1,8 @@
-﻿using Sword.Core;
-using Sword.Domain.Enums;
+﻿using Core;
+using Domain.Enums;
 using System;
 
-namespace Sword.Domain
+namespace Domain
 {
     public class Resc : BaseEntity
     {

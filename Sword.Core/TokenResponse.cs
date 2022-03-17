@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Sword.Core
+namespace Core
 {
     public class TokenResponse
     {

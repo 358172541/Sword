@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Sword.Core
+namespace Core
 {
     public interface IRepository<TEntity> where TEntity : class
     {

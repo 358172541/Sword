@@ -1,10 +1,10 @@
-﻿using Sword.Domain;
-using Sword.Domain.Enums;
+﻿using Domain;
+using Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
 
-namespace Sword.EntityFrameworkCore.Configurations
+namespace EntityFrameworkCore.Configurations
 {
     public class UserConfiguration : IEntityTypeConfiguration<User>
     {

@@ -1,6 +1,6 @@
-﻿using Sword.Core;
+﻿using Core;
 
-namespace Sword.Domain
+namespace Domain
 {
     public interface IRoleRescRepository : IRepository<RoleResc> { }
 }

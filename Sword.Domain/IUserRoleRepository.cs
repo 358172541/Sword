@@ -1,6 +1,12 @@
-﻿using Sword.Core;
+﻿using Core;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
-namespace Sword.Domain
+namespace Domain
 {
-    public interface IUserRoleRepository : IRepository<UserRole> { }
+    public interface IUserRoleRepository : IRepository<UserRole>
+    {
+        Task<List<Guid>> GetRoleIds(Guid userId);
+    }
 }

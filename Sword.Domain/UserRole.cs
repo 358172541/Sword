@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Sword.Domain
+namespace Domain
 {
     public class UserRole
     {

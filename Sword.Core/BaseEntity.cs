@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace Sword.Core
+namespace Core
 {
     public abstract class BaseEntity
     {

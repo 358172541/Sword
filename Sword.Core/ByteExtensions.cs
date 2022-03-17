@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Text;
 
-namespace Sword.Core
+namespace Core
 {
     public static class ByteExtensions
     {

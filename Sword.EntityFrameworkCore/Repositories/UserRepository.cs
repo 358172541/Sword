@@ -1,9 +1,9 @@
-﻿using Sword.Core;
-using Sword.Domain;
+﻿using Core;
+using Domain;
 
-namespace Sword.EntityFrameworkCore.Repositories
+namespace EntityFrameworkCore.Repositories
 {
-    public class UserRepository : SwordRepository<User>, IUserRepository
+    public class UserRepository : BaseRepository<User>, IUserRepository
     {
         public UserRepository(ITransaction transaction) : base(transaction) { }
     }

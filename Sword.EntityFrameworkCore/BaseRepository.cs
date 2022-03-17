@@ -1,16 +1,16 @@
-﻿using Sword.Core;
+﻿using Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
-namespace Sword.EntityFrameworkCore
+namespace EntityFrameworkCore
 {
-    public class SwordRepository<TEntity> : IRepository<TEntity> where TEntity : class
+    public class BaseRepository<TEntity> : IRepository<TEntity> where TEntity : class
     {
-        private readonly SwordDbContext _context;
-        public SwordRepository(ITransaction transaction) => _context = transaction as SwordDbContext;
+        private readonly AppDbContext _context;
+        public BaseRepository(ITransaction transaction) => _context = transaction as AppDbContext;
         public IQueryable<TEntity> Entities => _context.Set<TEntity>().Where(QueryFilter<TEntity>());
         public async ValueTask<TEntity> FindAsync(params object[] keyValues)
         {

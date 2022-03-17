@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Sword.Core
+namespace Core
 {
     public interface ITransaction : IDisposable
     {
