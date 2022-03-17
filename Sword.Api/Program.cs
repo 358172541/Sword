@@ -11,9 +11,6 @@ namespace Api
 {
     public class Program
     {
-        public static string Audience = "https://api.sword.com";
-        public static string Issuer = "https://api.sword.com";
-        public static string Secret = "Wjagjbmui5ZBCC0nV6HMdTsEYjznXJGqhOVIRbH50P8=";
         public static void Main(string[] args) => CreateHostBuilder(args).Build().Run();
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)

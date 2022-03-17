@@ -6,7 +6,7 @@ using System.Security.Claims;
 
 namespace Core
 {
-    // [Authorize]
+    [Authorize]
     public abstract class BaseController : ControllerBase
     {
         protected Guid Identity

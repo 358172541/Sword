@@ -15,12 +15,6 @@ namespace Api
 {
     public class UserController : BaseController
     {
-        private readonly IMapper _mapper;
-        private readonly ITransaction _transaction;
-        private readonly IRoleRepository _roleRepository;
-        private readonly IUserRepository _userRepository;
-        private readonly IUserRoleRepository _userRoleRepository;
-
         public UserController(
             IMapper mapper,
             ITransaction transaction,
@@ -28,12 +22,17 @@ namespace Api
             IUserRepository userRepository,
             IUserRoleRepository userRoleRepository)
         {
-            _mapper = mapper;
-            _transaction = transaction;
-            _roleRepository = roleRepository;
-            _userRepository = userRepository;
-            _userRoleRepository = userRoleRepository;
+            Mapper = mapper;
+            Transaction = transaction;
+            RoleRepository = roleRepository;
+            UserRepository = userRepository;
+            UserRoleRepository = userRoleRepository;
         }
+        public IMapper Mapper { get; }
+        public ITransaction Transaction { get; }
+        public IRoleRepository RoleRepository { get; }
+        public IUserRepository UserRepository { get; }
+        public IUserRoleRepository UserRoleRepository { get; }
 
         /// <summary>
         /// Users Search
@@ -43,8 +42,8 @@ namespace Api
         [HttpGet, Route("api/users")]
         public async Task<IActionResult> Users_Search()
         {
-            var users = await _userRepository.Entities.AsNoTracking().ToListAsync();
-            return Ok(_mapper.Map<List<UserDto>>(users));
+            var users = await UserRepository.Entities.AsNoTracking().ToListAsync();
+            return Ok(Mapper.Map<List<UserDto>>(users));
         }
 
         /// <summary>
@@ -56,11 +55,11 @@ namespace Api
         [HttpGet, Route("api/users/{id}", Name = "users:single")]
         public async Task<IActionResult> Users_Single(Guid id)
         {
-            var user = await _userRepository.FindAsync(id);
+            var user = await UserRepository.FindAsync(id);
             if (user == null)
                 throw new NotFoundException("not found.");
-            var dto = _mapper.Map<UserUpdateDto>(user);
-            dto.RoleIds = await _userRoleRepository.GetRoleIds(user.UserId);
+            var dto = Mapper.Map<UserUpdateDto>(user);
+            dto.RoleIds = await UserRoleRepository.GetRoleIds(user.UserId);
             return Ok(dto);
         }
 
@@ -72,7 +71,7 @@ namespace Api
         [HttpGet, Route("api/users/lookup")]
         public async Task<IActionResult> Users_Lookup()
         {
-            var roles = _mapper.Map<List<RoleDto>>(await _roleRepository.Entities.AsNoTracking().ToListAsync());
+            var roles = Mapper.Map<List<RoleDto>>(await RoleRepository.Entities.AsNoTracking().ToListAsync());
             return Ok(new { roles });
         }
 
@@ -85,19 +84,19 @@ namespace Api
         [HttpPost, Route("api/users")]
         public async Task<IActionResult> Users_Create([FromBody] UserCreateDto dto)
         {
-            var single = await _userRepository.Entities.AsNoTracking().SingleOrDefaultAsync(x => x.Account == dto.Account);
+            var single = await UserRepository.Entities.AsNoTracking().SingleOrDefaultAsync(x => x.Account == dto.Account);
             if (single != null)
                 throw new ValidationException("user's account exists. please try another one.");
-            var user = _mapper.Map<User>(dto);
-            await _userRepository.InsertAsync(user);
+            var user = Mapper.Map<User>(dto);
+            await UserRepository.InsertAsync(user);
             if (dto.RoleIds.Count > 0)
-                await _userRoleRepository.InsertAsync(
+                await UserRoleRepository.InsertAsync(
                     dto.RoleIds.Select(x => new UserRole
                     {
                         RoleId = x,
                         UserId = user.UserId
                     }).ToList());
-            await _transaction.SaveChangesAsync();
+            await Transaction.SaveChangesAsync();
             return CreatedAtRoute("users:single", new { id = user.UserId }, "");
         }
 
@@ -113,28 +112,28 @@ namespace Api
         {
             if (dto.Id == id)
             {
-                var user = await _userRepository.FindAsync(id);
+                var user = await UserRepository.FindAsync(id);
                 if (user == null)
                     throw new NotFoundException("not found.");
-                var single = await _userRepository.Entities.AsNoTracking().SingleOrDefaultAsync(x => x.Account == dto.Account && x.UserId != dto.Id);
+                var single = await UserRepository.Entities.AsNoTracking().SingleOrDefaultAsync(x => x.Account == dto.Account && x.UserId != dto.Id);
                 if (single != null)
                     throw new ValidationException("user's account exists. please try another one.");
                 if (dto.Version != user.Version.ToHexString())
                     throw new DbUpdateConcurrencyException("data changed.");
-                await _userRepository.UpdateAsync(_mapper.Map(dto, user));
+                await UserRepository.UpdateAsync(Mapper.Map(dto, user));
                 var userRoles = dto.RoleIds.Select(x => new UserRole
                 {
                     RoleId = x,
                     UserId = user.UserId
                 }).ToList();
-                var userRoles2 = await _userRoleRepository.Entities.Where(x => x.UserId == user.UserId).ToListAsync();
+                var userRoles2 = await UserRoleRepository.Entities.Where(x => x.UserId == user.UserId).ToListAsync();
                 var insertUserRoles = userRoles.Except(userRoles2).ToList();
                 if (insertUserRoles.Count > 0)
-                    await _userRoleRepository.InsertAsync(insertUserRoles);
+                    await UserRoleRepository.InsertAsync(insertUserRoles);
                 var deleteUserRoles = userRoles2.Except(userRoles).ToList();
                 if (deleteUserRoles.Count > 0)
-                    await _userRoleRepository.DeleteAsync(deleteUserRoles);
-                await _transaction.SaveChangesAsync();
+                    await UserRoleRepository.DeleteAsync(deleteUserRoles);
+                await Transaction.SaveChangesAsync();
                 return NoContent();
             }
             return BadRequest();
@@ -150,11 +149,11 @@ namespace Api
         [HttpDelete, Route("api/users/{id}")]
         public async Task<IActionResult> Users_Delete(Guid id)
         {
-            var user = await _userRepository.FindAsync(id);
+            var user = await UserRepository.FindAsync(id);
             if (user == null)
                 throw new NotFoundException("not found.");
-            await _userRepository.DeleteAsync(user);
-            await _transaction.SaveChangesAsync();
+            await UserRepository.DeleteAsync(user);
+            await Transaction.SaveChangesAsync();
             return NoContent();
         }
     }

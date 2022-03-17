@@ -4,6 +4,7 @@ using Domain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.IdentityModel.Tokens.Jwt;
@@ -14,16 +15,18 @@ namespace Api.Controllers
 {
     public class AuthController : BaseController
     {
-        private readonly ITransaction _transaction;
-        private readonly IUserRepository _userRepository;
-
         public AuthController(
+            IConfiguration configuration,
             ITransaction transaction,
             IUserRepository userRepository)
         {
-            _transaction = transaction;
-            _userRepository = userRepository;
+            Configuration = configuration;
+            Transaction = transaction;
+            UserRepository = userRepository;
         }
+        public IConfiguration Configuration { get; }
+        public ITransaction Transaction { get; }
+        public IUserRepository UserRepository { get; }
 
         /// <summary>
         /// √
@@ -34,7 +37,7 @@ namespace Api.Controllers
         [HttpPost, Route("api/auths/token")]
         public async Task<IActionResult> Auths_Token([FromBody] TokenRequest request)
         {
-            var user = await _userRepository.Entities.SingleOrDefaultAsync(x => x.Account == request.Account && x.Password == request.Password);
+            var user = await UserRepository.Entities.SingleOrDefaultAsync(x => x.Account == request.Account && x.Password == request.Password);
 
             if (user == null)
                 return NotFound();
@@ -49,8 +52,8 @@ namespace Api.Controllers
                 var tokenRefreshExpireTime = notBefore.AddSeconds(60 * 30); // yes and also update tokenRefreshExpireTime
                 var token = new JwtSecurityTokenHandler().WriteToken(
                     new JwtSecurityToken(
-                        Program.Issuer,
-                        Program.Audience,
+                        Configuration["AuthSetting:Issuer"],
+                        Configuration["AuthSetting:Audience"],
                         new Claim[]
                         {
                             new Claim(JwtRegisteredClaimNames.Sub, user.UserId.ToString())
@@ -58,14 +61,14 @@ namespace Api.Controllers
                         notBefore,
                         tokenExpireTime,
                         new SigningCredentials(new SymmetricSecurityKey(
-                            Convert.FromBase64String(Program.Secret)),
+                            Convert.FromBase64String(Configuration["AuthSetting:Secret"])),
                             SecurityAlgorithms.HmacSha256)
                     ));
                 user.Token = token;
                 user.TokenExpireTime = tokenExpireTime;
                 user.TokenRefreshExpireTime = tokenRefreshExpireTime;
-                await _userRepository.UpdateAsync(user);
-                await _transaction.SaveChangesAsync();
+                await UserRepository.UpdateAsync(user);
+                await Transaction.SaveChangesAsync();
             }
             else
             {
@@ -76,8 +79,8 @@ namespace Api.Controllers
                     var tokenRefreshExpireTime = user.TokenRefreshExpireTime; // yes but not update tokenRefreshExpireTime
                     var token = new JwtSecurityTokenHandler().WriteToken(
                         new JwtSecurityToken(
-                            Program.Issuer,
-                            Program.Audience,
+                            Configuration["AuthSetting:Issuer"],
+                            Configuration["AuthSetting:Audience"],
                             new Claim[]
                             {
                                 new Claim(JwtRegisteredClaimNames.Sub, user.UserId.ToString())
@@ -85,14 +88,14 @@ namespace Api.Controllers
                             notBefore,
                             tokenExpireTime,
                             new SigningCredentials(new SymmetricSecurityKey(
-                                Convert.FromBase64String(Program.Secret)),
+                                Convert.FromBase64String(Configuration["AuthSetting:Secret"])),
                                 SecurityAlgorithms.HmacSha256)
                         ));
                     user.Token = token;
                     user.TokenExpireTime = tokenExpireTime;
                     user.TokenRefreshExpireTime = tokenRefreshExpireTime;
-                    await _userRepository.UpdateAsync(user);
-                    await _transaction.SaveChangesAsync();
+                    await UserRepository.UpdateAsync(user);
+                    await Transaction.SaveChangesAsync();
                 }
             }
 
@@ -121,10 +124,10 @@ namespace Api.Controllers
                     request.Token,
                     new TokenValidationParameters
                     {
-                        IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(Program.Secret)),
+                        IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(Configuration["AuthSetting:Secret"])),
                         RequireExpirationTime = true,
-                        ValidAudience = Program.Audience,
-                        ValidIssuer = Program.Issuer,
+                        ValidAudience = Configuration["AuthSetting:Audience"],
+                        ValidIssuer = Configuration["AuthSetting:Issuer"],
                         ValidateAudience = true,
                         ValidateIssuer = true,
                         ValidateIssuerSigningKey = true,
@@ -144,7 +147,7 @@ namespace Api.Controllers
 
             _ = Guid.TryParse(claim?.Value, out var userId);
 
-            var user = await _userRepository.FindAsync(userId);
+            var user = await UserRepository.FindAsync(userId);
 
             if (user.Token != request.Token ||
                 user.TokenExpireTime.Value != request.TokenExpireTime ||
@@ -162,8 +165,8 @@ namespace Api.Controllers
                     var tokenRefreshExpireTime = user.TokenRefreshExpireTime; // yes but not update tokenRefreshExpireTime
                     var token = new JwtSecurityTokenHandler().WriteToken(
                         new JwtSecurityToken(
-                            Program.Issuer,
-                            Program.Audience,
+                            Configuration["AuthSetting:Issuer"],
+                            Configuration["AuthSetting:Audience"],
                             new Claim[]
                             {
                                 new Claim(JwtRegisteredClaimNames.Sub, user.UserId.ToString())
@@ -171,14 +174,14 @@ namespace Api.Controllers
                             notBefore,
                             tokenExpireTime,
                             new SigningCredentials(new SymmetricSecurityKey(
-                                Convert.FromBase64String(Program.Secret)),
+                                Convert.FromBase64String(Configuration["AuthSetting:Secret"])),
                                 SecurityAlgorithms.HmacSha256)
                         ));
                     user.Token = token;
                     user.TokenExpireTime = tokenExpireTime;
                     user.TokenRefreshExpireTime = tokenRefreshExpireTime;
-                    await _userRepository.UpdateAsync(user);
-                    await _transaction.SaveChangesAsync();
+                    await UserRepository.UpdateAsync(user);
+                    await Transaction.SaveChangesAsync();
                 }
             }
 
@@ -204,14 +207,14 @@ namespace Api.Controllers
         //    if (user.Type == UserType.MANAGER)
         //    {
         //        var rescs = await _rescRepository.Entities.AsNoTracking().ToListAsync();
-        //        return Ok(_mapper.Map<List<RescModel>>(rescs));
+        //        return Ok(Mapper.Map<List<RescModel>>(rescs));
         //    }
         //    else
         //    {
         //        var roleIds = await _userRoleRepository.Entities.AsNoTracking().Where(x => x.UserId == Identity).Select(x => x.RoleId).ToListAsync();
         //        var rescIds = await _roleRescRepository.Entities.AsNoTracking().Where(x => roleIds.Contains(x.RoleId)).Select(x => x.RescId).ToListAsync();
         //        var rescs = await _rescRepository.Entities.AsNoTracking().Where(x => rescIds.Contains(x.RescId)).ToListAsync();
-        //        return Ok(_mapper.Map<List<RescModel>>(rescs));
+        //        return Ok(Mapper.Map<List<RescModel>>(rescs));
         //    }
         //}
 

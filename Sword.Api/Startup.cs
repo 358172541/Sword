@@ -45,10 +45,10 @@ namespace Api
                 {
                     opts.TokenValidationParameters = new TokenValidationParameters
                     {
-                        IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(Program.Secret)),
+                        IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(Configuration["AuthSetting:Secret"])),
                         RequireExpirationTime = true,
-                        ValidAudience = Program.Audience,
-                        ValidIssuer = Program.Issuer,
+                        ValidAudience = Configuration["AuthSetting:Audience"],
+                        ValidIssuer = Configuration["AuthSetting:Issuer"],
                         ValidateAudience = true,
                         ValidateIssuer = true,
                         ValidateIssuerSigningKey = true,
@@ -78,7 +78,7 @@ namespace Api
                 });
             svcs.AddHttpContextAccessor();
 
-            svcs.AddMemoryCache().AddSenparcWeixinServices(Configuration); // Senparc
+            //svcs.AddMemoryCache().AddSenparcWeixinServices(Configuration); // Senparc
 
             if (Environment.IsDevelopment())
             {
@@ -107,13 +107,13 @@ namespace Api
                     opts.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "appdocument.xml"), true);
                     opts.SwaggerDoc("v1", new OpenApiInfo
                     {
-                        Title = "Sword.Api Title",
+                        Title = "Api Title",
                         Version = "v1",
-                        Description = "Sword.Api Description",
+                        Description = "Api Description",
                         Contact = new OpenApiContact
                         {
-                            Name = "Sword",
-                            Email = "sword@hotmail.com"
+                            Name = "Api",
+                            Email = "api@hotmail.com"
                         }
                     });
                 });
@@ -129,20 +129,17 @@ namespace Api
             // budr.UseDefaultFiles();
             budr.UseStaticFiles();
 
-            budr.UseSenparcGlobal(Environment, senparcSetting.Value, _ => { }, true)
-                .UseSenparcWeixin(senparcWeixinSetting.Value, (weixinRegister, b) => weixinRegister.RegisterMpAccount(senparcWeixinSetting.Value)); // Senparc
+            //budr.UseSenparcGlobal(Environment, senparcSetting.Value, _ => { }, true)
+            //    .UseSenparcWeixin(senparcWeixinSetting.Value, (regr, sett) => regr.RegisterMpAccount(senparcWeixinSetting.Value)); // Senparc
 
             budr.UseRouting();
             budr.UseCors();
             budr.UseAuthentication();
             budr.UseAuthorization();
 
-            budr.UseMessageHandlerForMp("/wx",
-                (strm, post, count, provider) => new TestMessageHandler(strm, post, count, provider),
-                opts =>
-                {
-                    opts.AccountSettingFunc = context => senparcWeixinSetting.Value;
-                }); // Senparc
+            //budr.UseMessageHandlerForMp("/wx", 
+            //    (strm, post, cont, prdr) => new TestMessageHandler(strm, post, cont, prdr),
+            //    opts => opts.AccountSettingFunc = context => senparcWeixinSetting.Value); // Senparc
 
             budr.UseEndpoints(x => x.MapControllers());
 
