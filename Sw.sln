@@ -1,17 +1,16 @@
-﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32210.238
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sword.Api", "Sword.Api\Sword.Api.csproj", "{33B0CA76-DBE6-456D-A803-97748FAF7E31}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sw.Api", "Sw.Api\Sw.Api.csproj", "{33B0CA76-DBE6-456D-A803-97748FAF7E31}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sword.Application", "Sword.Application\Sword.Application.csproj", "{7A9A40CD-0D18-4E29-8C23-84319B1A9425}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sw.Application", "Sw.Application\Sw.Application.csproj", "{7A9A40CD-0D18-4E29-8C23-84319B1A9425}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sword.Core", "Sword.Core\Sword.Core.csproj", "{7CD67347-B6A4-49E0-969A-6FC6D6B45532}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sw.Core", "Sw.Core\Sw.Core.csproj", "{7CD67347-B6A4-49E0-969A-6FC6D6B45532}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sword.Domain", "Sword.Domain\Sword.Domain.csproj", "{A2FBFA23-6660-4B5D-8C9A-879B553B65B9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sw.Domain", "Sw.Domain\Sw.Domain.csproj", "{A2FBFA23-6660-4B5D-8C9A-879B553B65B9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sword.EntityFrameworkCore", "Sword.EntityFrameworkCore\Sword.EntityFrameworkCore.csproj", "{362ED42C-F37D-46D2-AB1E-2BA8EDC878ED}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sw.EntityFrameworkCore", "Sw.EntityFrameworkCore\Sw.EntityFrameworkCore.csproj", "{362ED42C-F37D-46D2-AB1E-2BA8EDC878ED}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
