@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
 
-namespace Api
+namespace Api.Controllers
 {
     public class UserController : BaseController
     {
@@ -145,13 +145,12 @@ namespace Api
         /// <param name="id"></param>
         /// <returns></returns>
         // [Security("User.Delete")]
-        [AllowAnonymous]
         [HttpDelete, Route("api/users/{id}")]
         public async Task<IActionResult> Users_Delete(Guid id)
         {
             var user = await UserRepository.FindAsync(id);
             if (user == null)
-                throw new NotFoundException("not found.");
+                throw new NotFoundException("entity not found.");
             await UserRepository.DeleteAsync(user);
             await Transaction.SaveChangesAsync();
             return NoContent();

@@ -29,7 +29,7 @@ namespace Api.Controllers
         public IUserRepository UserRepository { get; }
 
         /// <summary>
-        /// √
+        /// token request
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
@@ -108,7 +108,7 @@ namespace Api.Controllers
         }
 
         /// <summary>
-        /// √
+        /// token refresh
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
@@ -137,7 +137,6 @@ namespace Api.Controllers
             }
             catch (Exception)
             {
-                // return BadRequest(); // ???
                 throw new TokenException("token invalid.");
             }
 

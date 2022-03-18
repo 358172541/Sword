@@ -146,7 +146,7 @@ namespace Api
             if (Environment.IsDevelopment())
             {
                 budr.UseSwagger(x => x.RouteTemplate = "swagger/{documentName}/swagger.json");
-                budr.UseSwaggerUI(x => x.SwaggerEndpoint("v1/swagger.json", "The Sword API"));
+                budr.UseSwaggerUI(x => x.SwaggerEndpoint("v1/swagger.json", "The API"));
             }
         }
     }

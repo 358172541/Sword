@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace Application.Dtos
 {
-    internal class RoleUpdateDto
+    public class RoleUpdateDto
     {
+
     }
 }
