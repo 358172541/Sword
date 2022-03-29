@@ -10,6 +10,7 @@ namespace Application
 {
     public class MapperProfile : Profile
     {
+        /*
         public static readonly Dictionary<bool, string> AVAILABLE =
             new Dictionary<bool, string>
             {
@@ -68,5 +69,6 @@ namespace Application
                     dest => dest.Version,
                     opts => opts.Ignore());
         }
+        */
     }
 }

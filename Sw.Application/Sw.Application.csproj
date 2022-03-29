@@ -6,6 +6,18 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="Dtos\RescCreateDto.cs" />
+	  <Compile Remove="Dtos\RescDto.cs" />
+	  <Compile Remove="Dtos\RescUpdateDto.cs" />
+	  <Compile Remove="Dtos\RoleCreateDto.cs" />
+	  <Compile Remove="Dtos\RoleDto.cs" />
+	  <Compile Remove="Dtos\RoleUpdateDto.cs" />
+	  <Compile Remove="Dtos\UserCreateDto.cs" />
+	  <Compile Remove="Dtos\UserDto.cs" />
+	  <Compile Remove="Dtos\UserUpdateDto.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
 	</ItemGroup>
 

@@ -1,12 +1,20 @@
 ﻿using Core;
-using System;
 
 namespace Domain
 {
+    /// <summary>
+    /// 角色
+    /// </summary>
     public class Role : BaseEntity
     {
-        public Guid RoleId { get; set; }
-        public string Display { get; set; }
-        public bool Available { get; set; }
+        /// <summary>
+        /// 主键
+        /// </summary>
+        public int Id { get; set; }
+
+        /// <summary>
+        /// 名称
+        /// </summary>
+        public string Name { get; set; }
     }
 }

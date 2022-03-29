@@ -1,6 +1,7 @@
 ﻿using Api.Exceptions;
 using Core;
 using Domain;
+using Domain.IRepositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -15,6 +16,7 @@ namespace Api.Controllers
 {
     public class AuthController : BaseController
     {
+        /*
         public AuthController(
             IConfiguration configuration,
             ITransaction transaction,
@@ -191,6 +193,7 @@ namespace Api.Controllers
                 TokenRefreshExpireTime = (DateTime)user.TokenRefreshExpireTime
             });
         }
+        */
 
         //[HttpGet, Route("api/auths/profile")]
         //public async Task<IActionResult> Auths_Profile()

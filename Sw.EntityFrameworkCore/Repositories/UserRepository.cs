@@ -1,5 +1,6 @@
 ﻿using Core;
 using Domain;
+using Domain.IRepositories;
 
 namespace EntityFrameworkCore.Repositories
 {

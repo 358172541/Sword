@@ -15,6 +15,7 @@ namespace Api.Controllers
 {
     public class UserController : BaseController
     {
+        /*
         public UserController(
             IMapper mapper,
             ITransaction transaction,
@@ -155,5 +156,6 @@ namespace Api.Controllers
             await Transaction.SaveChangesAsync();
             return NoContent();
         }
+        */
     }
 }

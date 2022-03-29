@@ -24,8 +24,9 @@ namespace Api.Attributes
         {
             Identities = identities;
         }
-        public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
+        public Task OnAuthorizationAsync(AuthorizationFilterContext context)
         {
+            /*
             var currentUser = await CurrentUser(context);
             if (currentUser == null) PermissionDenied(context);
             if (currentUser.Type == UserType.MANAGER == false)
@@ -35,7 +36,10 @@ namespace Api.Attributes
                 var convertAttrRescIds = await ConvertAttrRescIds(context);
                 if (currentUserRescIds.Intersect(convertAttrRescIds).Any() == false) PermissionDenied(context);
             }
+            */
+            return Task.CompletedTask;
         }
+        /*
         private static async Task<User> CurrentUser(AuthorizationFilterContext context)
         {
             var identity = context.HttpContext.User.Identity as ClaimsIdentity;
@@ -77,5 +81,6 @@ namespace Api.Attributes
             context.HttpContext.Response.Headers.Add("X-Permission", "Denied");
             context.Result = new ObjectResult(JsonConvert.SerializeObject(new string[] { "Permission denied." })) { StatusCode = StatusCodes.Status403Forbidden };
         }
+        */
     }
 }
